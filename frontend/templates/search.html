@@ -1,0 +1,169 @@
+{% extends "base.html" %} {% block title %}Search Page{% endblock %} {% block
+content %}
+<section class="jumbotron text-center">
+  <div class="container">
+    <h1 class="jumbotron-heading">Search Anime</h1>
+    <p class="lead text-muted">Explore the Vault</p>
+    <form method="POST">
+      <div class="input-group mb-3">
+        <label for="query" class="visually-hidden">Search Query</label>
+        <input
+          type="text"
+          id="query"
+          name="query"
+          class="form-control"
+          placeholder="Enter anime title"
+          aria-label="Search Query"
+        />
+      </div>
+      <div class="btn-group" role="group" aria-label="Search options">
+        <button
+          type="submit"
+          name="submit"
+          value="search"
+          class="btn btn-primary my-2"
+        >
+          Search
+        </button>
+        <button
+          type="submit"
+          name="submit"
+          value="random"
+          class="btn btn-secondary my-2"
+        >
+          Random Anime
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+{% if animes %}
+<div class="album py-5 bg-light">
+  <div class="container">
+    <div class="row">
+      {% for anime in animes %}
+      <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+          <img
+            class="card-img-top"
+            src="{{ anime.main_picture }}"
+            alt="{{ anime.title }} image"
+          />
+          <div class="card-body">
+            <h5 class="card-title">{{ anime.title }}</h5>
+            <p class="card-text">{{ anime.synopsis | truncate(150) }}</p>
+            <p class="card-text">
+              <strong>Genres:</strong>
+              {% for genre in anime.genres %}
+              <span class="badge bg-secondary">{{ genre.name }}</span>
+              {% endfor %}
+            </p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="btn-group">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary"
+                  data-bs-toggle="modal"
+                  data-bs-target="#animeModal{{ anime.id }}"
+                >
+                  View Details
+                </button>
+                <!-- Form to add anime to user list -->
+                <form action="/add_to_list" method="post">
+                  <input type="hidden" name="anime_id" value="{{ anime.id }}" />
+                  <input
+                    type="hidden"
+                    name="anime_main_picture"
+                    value="{{ anime.main_picture }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="anime_title"
+                    value="{{ anime.title }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="anime_synopsis"
+                    value="{{ anime.synopsis }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="anime_genres"
+                    value="{{ anime.genres }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="anime_episodes"
+                    value="{{ anime.episodes }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="anime.new_status"
+                    value="{{ selected_status }}"
+                  />
+
+                  <button type="submit" class="btn btn-primary">
+                    Add to List
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Anime Details Modal -->
+      <div
+        class="modal fade"
+        id="animeModal{{ anime.id }}"
+        tabindex="-1"
+        aria-labelledby="animeModalLabel{{ anime.id }}"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="animeModalLabel{{ anime.id }}">
+                {{ anime.title }}
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p><strong>Synopsis:</strong> {{ anime.synopsis }}</p>
+              <p>
+                <strong>Genres:</strong>
+                {% for genre in anime.genres %}
+                <span class="badge bg-secondary">{{ genre.name }}</span>
+                {% endfor %}
+              </p>
+              <p><strong>Episodes:</strong> {{ anime.episodes }}</p>
+              <p><strong>Status:</strong> {{ anime.status }}</p>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="button" class="btn btn-primary">Add to List</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% else %}
+<p class="text-center text-muted">
+  No results found. Please try a different search.
+</p>
+{% endif %} {% endblock %}

@@ -1,0 +1,23 @@
+<!-- Hero Section -->
+<!-- <header class="hero bg-dark text-white text-center py-5">
+  <div class="container position-relative">
+    <img
+      src="{{ url_for('static', filename='logo.jpg') }}"
+      alt="Logo"
+      class="hero-image"
+    />
+    <h1 class="display-4">Welcome to Anime Vault</h1>
+    <p class="lead">Discover the latest anime and track your watchlist</p>
+    <form method="POST" action="/search">
+      <div class="input-group mb-3 mx-auto" style="max-width: 500px">
+        <input
+          type="text"
+          name="query"
+          class="form-control"
+          placeholder="Search for anime..."
+        />
+        <button type="submit" class="btn btn-primary">Search</button>
+      </div>
+    </form>
+  </div>
+</header> -->
