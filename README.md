@@ -8,6 +8,7 @@ Anime Vault Web React is a web application built with React to manage and explor
 - Add, edit, and delete anime entries.
 - Check key statistics
 - Responsive design for desktop and mobile.
+- Computer vision implmentation for users to find their favourite anime characters\*\*\*
 
 ## Technologies Used
 
