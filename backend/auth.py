@@ -2,6 +2,9 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+import json
+from flask import json
+from flask import jsonify
 # from __init__ import db
 # from models import User
 
@@ -43,8 +46,8 @@ def sign_up():
 
     #get sign up request data
     if request.method == 'POST':
-        email = request.form.get("email")
-        username = request.form.get("username")
+        email = request.json.get("email")
+        username = request.json.get("username")
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
@@ -72,8 +75,9 @@ def sign_up():
             flash('User created!')
             return redirect(url_for('views.home'))
 
+    return jsonify({ "success": True, "message": "User created!" })
     
-    return render_template("signup.html", user = current_user)
+    # return render_template("signup.html", user = current_user)
 
 
 
