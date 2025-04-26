@@ -1,11 +1,11 @@
-import { Container, Paper } from "@mui/material";
-import React from "react";
+// import { Container, Paper } from "@mui/material";
+// import Button from '@mui/material/Button';
 
 // function Signup() {
 //   return (
 //     <form>
 //       <label>
-//         Enter your name:
+//         Enter your name my guy:
 //         <input type="text" />
 //         <div> Signup</div>
 //       </label>
@@ -15,13 +15,9 @@ import React from "react";
 
 // export default Signup;
 
-//Create Sign up Page using material UI
-const Signup = () => {
-  return (
-    <Container maxWidth="xs">
-      <Paper elevation={10}>Signup Page</Paper>
-    </Container>
-  );
-};
+import * as React from "react";
+import Button from "@mui/material/Button";
 
-export default Signup;
+export default function Signup() {
+  return <Button variant="outlined">Signup</Button>;
+}
