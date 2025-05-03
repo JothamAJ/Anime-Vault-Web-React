@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_session import Session
 import os
+from flask_cors import CORS #enable CORS to allow flask and react to run
 
 # from flask_wtf.csrf import CSRFProtect
 
@@ -26,6 +27,7 @@ def create_app():
     template_folder=os.path.abspath("/Users/jotham/Documents/Anime_Vault/Anime Vault Web React/frontend/templates")  #Tell Flask where templates are
     static_folder = os.path.abspath("/Users/jotham/Documents/Anime_Vault/Anime Vault Web React/static")
     app = Flask(__name__, template_folder=template_folder, static_folder= static_folder)
+    CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}}) #global CORS
     
     # Server side sessions because flash messages were not working
     app.config['SESSION_TYPE'] = 'filesystem'  # Stores session files on the server
