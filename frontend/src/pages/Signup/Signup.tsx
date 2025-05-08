@@ -24,21 +24,39 @@ const SignupPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     //connect to flask backend using fetch and send state values
-    const response = await fetch("http://localhost:5000/sign-up", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(formData), //send JSON data to backend
-    });
 
-    if (response.ok) {
-      console.log("Signup successful!");
-    } else {
-      const errorData = await response.json();
-      console.error("Signup failed:", errorData);
+    //password validation
+    if (formData.password1 !== formData.password2) {
+      console.error("Passwords do not match.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000/sign-up", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        mode: "cors",
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        console.log("Signup successful!");
+      } else {
+        let errorMessage = "Unknown error";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData?.message || JSON.stringify(errorData);
+        } catch (err) {
+          errorMessage = "No JSON response (likely 403 or server issue)";
+        }
+        console.error("Signup failed:", errorMessage);
+      }
+    } catch (error) {
+      console.error("Network error:", error);
     }
 
     console.log(formData.email + formData.username + formData.password1);
