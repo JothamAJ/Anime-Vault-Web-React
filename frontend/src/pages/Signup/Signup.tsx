@@ -59,7 +59,13 @@ const SignupPage = () => {
       console.error("Network error:", error);
     }
 
-    console.log(formData.email + formData.username + formData.password1);
+    console.log(
+      formData.email +
+        "     " +
+        formData.username +
+        "     " +
+        formData.password1
+    );
   };
 
   return (

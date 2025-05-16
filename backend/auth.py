@@ -1,16 +1,18 @@
 #File with authentication routes
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, make_response
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify
 from flask_cors import cross_origin
 from flask_cors import CORS
+import sys 
+from flask_wtf.csrf import CSRFProtect
+# for debugging 
 # from __init__ import db
 # from models import User
 
 CLIENT_ID = 'd7382139725675f1a561f7c2fd0009c2'
 auth = Blueprint("auth", __name__)
-# CORS(auth, origins=["http://localhost:5000"], supports_credentials=True)
 
 
 @auth.route("/login", methods = ['GET', 'POST'])
@@ -38,69 +40,79 @@ def login():
     return jsonify({ "success": True, "message": "Successfully logged in " })
 
 
-
-
+import sys  # Add this at the top
 
 @auth.route("/sign-up", methods=['GET', 'POST', 'OPTIONS'])
-# @cross_origin(origins='http://localhost:3000', supports_credentials=True)
 def sign_up():
     from __init__ import db
     from models import User
 
     if request.method == "OPTIONS":
-        return '', 200
+        response = make_response()
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response
 
     if request.method == "GET":
         return jsonify({"Testing Testing": "Signup endpoint is ready"}), 200
 
     if request.method == "POST":
+        try:
+            data = request.get_json(force=True)
+            sys.stdout.write(f"Received Data: {data}\n")
+            sys.stdout.flush()
 
-    # POST request
-        data = request.get_json()
+            if data is None:
+                sys.stdout.write("Did not receive data\n")
+                sys.stdout.flush()
+                return jsonify({"success": False, "message": "No JSON data provided"}), 415
 
-        if data is None:
-            return jsonify({"success": False, "message": "No JSON data provided"}), 415
+            # get form fields
+            email = data.get("email")
+            username = data.get("username")
+            password1 = data.get("password1")
+            password2 = data.get("password2")
 
-        print("Received Data:", data)  #debug
-        print(request.data)
+            sys.stdout.write(f"Email: {email}, Username: {username}, Password1: {password1}, Password2: {password2}\n")
+            sys.stdout.flush()
 
-        #get form fields
-        email = data.get("email")
-        username = data.get("username")
-        password1 = data.get("password1")
-        password2 = data.get("password2")
+            # Validation checks
+            if User.query.filter_by(email=email).first():
+                return jsonify({"success": False, "message": "Email is already in use!"}), 400
+            if User.query.filter_by(username=username).first():
+                return jsonify({"success": False, "message": "Username is already in use!"}), 400
+            if password1 != password2:
+                return jsonify({"success": False, "message": "Passwords do not match!"}), 400
+            if len(username) < 2:
+                return jsonify({"success": False, "message": "Username is too short!"}), 400
+            if len(password1) < 6:
+                return jsonify({"success": False, "message": "Password is too short!"}), 400
+            if len(email) < 4:
+                return jsonify({"success": False, "message": "Email is too short!"}), 400
 
-        print(f"Email: {email}, Username: {username}, Password1: {password1}, Password2: {password2}")  #debug
+            # Create user
+            new_user = User(
+                email=email,
+                username=username,
+                password=generate_password_hash(password1)
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user, remember=True)
 
-        # Validation checks
-        email_exists = User.query.filter_by(email=email).first()
-        username_exists = User.query.filter_by(username=username).first()
+            sys.stdout.write("User created and logged in.\n")
+            sys.stdout.flush()
 
-        if email_exists:
-            return jsonify({"success": False, "message": "Email is already in use!"}), 400
-        elif username_exists:
-            return jsonify({"success": False, "message": "Username is already in use!"}), 400
-        elif password1 != password2:
-            return jsonify({"success": False, "message": "Passwords do not match!"}), 400
-        elif len(username) < 2:
-            return jsonify({"success": False, "message": "Username is too short!"}), 400
-        elif len(password1) < 6:
-            return jsonify({"success": False, "message": "Password is too short!"}), 400
-        elif len(email) < 4:
-            return jsonify({"success": False, "message": "Email is too short!"}), 400
+            return jsonify({"success": True, "message": "User created!"}), 201
 
-        #Create user
-        new_user = User(
-            email=email,
-            username=username,
-            password=generate_password_hash(password1)
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        login_user(new_user, remember=True)
+        except Exception as e:
+            sys.stdout.write(f"JSON parse error: {e}\n")
+            sys.stdout.flush()
+            return jsonify({"message": "Invalid JSON"}), 400
 
-        print("User created and logged in.")
-        return jsonify({"success": True, "message": "User created!"}), 201
+
 
 
 @auth.route("/logout")
