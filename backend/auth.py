@@ -16,31 +16,43 @@ auth = Blueprint("auth", __name__)
 
 
 @auth.route("/login", methods = ['GET', 'POST'])
-@cross_origin()
 def login():
     from models import User
-    if request.method == 'POST':
-        #username = request.form.get('username')
-        email = request.form.get("email")
-        password = request.form.get("password")
+
+    if request.method == "OPTIONS":
+        response = make_response()
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response
+    
+    if request.method == "GET":
+        return jsonify({"Testing Testing": "Signup endpoint is ready"}), 200
+
+    if request.method =='POST':
+
+        data = request.get_json()
+        email = data.get("email")
+        password = data.get("password")
+
+        # catch error
+        if not email or not password:
+            return jsonify({"success": False, "message": "Username and password are required"}), 400
 
         #If user exists and password matches then log in user
         user= User.query.filter_by(email=email).first() 
-        if user:
-            if check_password_hash(user.password, password):
-                flash("Logged In!", category='success')
+        if user and check_password_hash(user.password, password):
                 login_user(user, remember= True)
-                return redirect(url_for('views.home'))
-            else:
-                flash('Password is incorrect', category= 'error')
+
+                sys.stdout.write(f"Email: {email}, Password: {password}\n")
+                sys.stdout.flush()
+        
+                return jsonify({"success": True, "message": "Login successful"}), 200
+
         else:
-            flash('Email does not exist', category = 'error')
-    
-    # return render_template("login.html", user = current_user) #return currently logged in or not user, to check if authenticated
-    return jsonify({ "success": True, "message": "Successfully logged in " })
-
-
-import sys  # Add this at the top
+        #handle failed login attempt
+             return jsonify({"success": False, "message": "Invalid username or password"}), 401
 
 @auth.route("/sign-up", methods=['GET', 'POST', 'OPTIONS'])
 def sign_up():
