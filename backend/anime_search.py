@@ -2,68 +2,78 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from flask import session
+from flask import jsonify
 import requests
+import sys
 
 
 anime = Blueprint('anime', __name__)
 CLIENT_ID = 'd7382139725675f1a561f7c2fd0009c2'
 
 
-@anime.route('/search', methods = ['GET', 'POST'])
+@anime.route('/search', methods = ['GET'])
 def anime_search():
         search_url = 'https://api.myanimelist.net/v2/anime'
         animes = []
-
+        # authentication headers
         headers = {
                 'X-MAL-CLIENT-ID': CLIENT_ID,
                 }
+        
+        # Get user query
+        query = request.args.get('query')
 
-        if request.method == 'POST': #user request
+        if not query:
+              return jsonify({'error':'No query provided'}), 400
+              
 
-                params = {
-                'q' :  request.form.get('query'), #get user query
+        # if request.method == 'GET': #user request
+        else:
+            params = {
+                'q' :  query, #get user query
                 'limit': '9'    
                 }
 
                 #Get the list of anime based on search query
-                r = requests.get(search_url, headers=headers, params= params) 
-                results = r.json().get('data', []) #return empty list if no options found
-                
+            r = requests.get(search_url, headers=headers, params= params) 
+            results = r.json().get('data', []) #return empty list if no options found
+                    
 
-                anime_ids = [result['node']['id'] for result in results]
-                #Get anime details
-                anime_details = []
-                for anime_id in anime_ids:
-                        anime_url = f'https://api.myanimelist.net/v2/anime/{anime_id}'
-                        anime_params = {
-                        'fields': 'title,alternative_titles,genres,synopsis,num_episodes,rating,status',
-                        'limit': '9'
-                        }
-                        r = requests.get(anime_url, headers=headers, params= anime_params)
-                        anime_details.append(r.json())
-                        
-                
+            anime_ids = [result['node']['id'] for result in results]
+            #Get anime details
+            anime_details = []
+            for anime_id in anime_ids:
+                    anime_url = f'https://api.myanimelist.net/v2/anime/{anime_id}'
+                    anime_params = {
+                    'fields': 'title,alternative_titles,genres,synopsis,num_episodes,rating,status',
+                    'limit': '9'
+                    }
+                    r = requests.get(anime_url, headers=headers, params= anime_params)
+                    anime_details.append(r.json())
+                            
+                    
 
-                #specific anime details
-                for anime in anime_details:
-                        anime_data = {
-                                'id' : anime['id'],
-                                'title' : anime['title'],
-                                'genres' : anime['genres'],
-                                'main_picture' : anime['main_picture']['large'],
-                                'synopsis' : anime['synopsis'],
-                                'episodes' : anime['num_episodes'],
-                                'status' : anime['status']
-                        }
-                
-                        animes.append(anime_data)      
-                
+            #specific anime details
+            for anime in anime_details:
+                    anime_data = {
+                            'id' : anime['id'],
+                            'title' : anime['title'],
+                            'genres' : anime['genres'],
+                            'main_picture' : anime['main_picture']['large'],
+                            'synopsis' : anime['synopsis'],
+                            'episodes' : anime['num_episodes'],
+                            'status' : anime['status']
+                    }
+                    
+                    animes.append(anime_data)      
+                    
+            
+            return jsonify(animes)
         
-        #store data in session to add to list
-                session["anime_search_results"] = animes
-                
-        return render_template('search.html', user = current_user, animes = animes)
-        
+
+
+
+
 
 
 

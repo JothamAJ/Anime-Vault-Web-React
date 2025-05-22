@@ -1,7 +1,7 @@
 import { Container, Typography, Box } from "@mui/material";
 import { SearchBar } from "../../components/SearchBar";
 
-const HomePage = () => {
+const SearchPage = () => {
   return (
     <Container maxWidth="md">
       <Box
@@ -15,7 +15,7 @@ const HomePage = () => {
         }}
       >
         <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>
-          Welcome to Anime Vault!
+          Explore the Vault!
         </Typography>
         <Typography variant="subtitle1" color="text.secondary">
           Track, discover, and explore your favorite anime!
@@ -26,4 +26,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default SearchPage;

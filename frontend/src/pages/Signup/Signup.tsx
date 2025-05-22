@@ -10,7 +10,7 @@ import {
 import Button from "@mui/material/Button";
 import { useState, useEffect } from "react";
 
-const SignupPage = () => {
+const SignUpPage = () => {
   //Form function to handle the user submit
   // Default variables, set to empty string to change later in function
   // sets form value and returns it throughout application
@@ -140,4 +140,4 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage;
+export default SignUpPage;

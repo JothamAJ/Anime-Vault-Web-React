@@ -11,7 +11,7 @@ import {
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const LogInPage = () => {
+const SignInPage = () => {
   //username and password states
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -19,7 +19,6 @@ const LogInPage = () => {
     email: "",
     password: "",
   });
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,16 +35,12 @@ const LogInPage = () => {
         body: JSON.stringify(formData),
       });
 
-
       if (response.ok) {
         console.log("Login successful!");
         navigate("/Home");
-
-
       } else {
         let errorMessage = "Unknown error";
 
-        
         try {
           const errorData = await response.json();
           errorMessage = errorData?.message || JSON.stringify(errorData);
@@ -122,4 +117,4 @@ const LogInPage = () => {
   );
 };
 
-export default LogInPage;
+export default SignInPage;
