@@ -20,7 +20,6 @@ const HomePage = () => {
         <Typography variant="subtitle1" color="text.secondary">
           Track, discover, and explore your favorite anime!
         </Typography>
-        <SearchBar />
       </Box>
     </Container>
   );

@@ -59,7 +59,7 @@ def anime_search():
                             'id' : anime['id'],
                             'title' : anime['title'],
                             'genres' : anime['genres'],
-                            'main_picture' : anime['main_picture']['large'],
+                            'image' : anime['main_picture']['large'],
                             'synopsis' : anime['synopsis'],
                             'episodes' : anime['num_episodes'],
                             'status' : anime['status']
@@ -70,7 +70,6 @@ def anime_search():
             
             return jsonify(animes)
         
-
 
 
 
