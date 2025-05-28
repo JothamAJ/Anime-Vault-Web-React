@@ -76,47 +76,55 @@ def anime_search():
 
 
 
+@anime.route('/ranking/<ranking_type>', methods=['GET'])
 def get_anime_ranking(ranking_type):
-    animes = []
-    url = 'https://api.myanimelist.net/v2/anime/ranking'
-    headers = {
-        'X-MAL-CLIENT-ID': CLIENT_ID,
-    }
-    params = {
-        'ranking_type': ranking_type,
-        'limit': '9'
-    }
-   
-    response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()  # Raise an exception for non-2xx status codes
-    results = response.json().get('data', [])
-    anime_ids = [result['node']['id'] for result in results]
 
-    anime_details = []
-    for id in anime_ids:
-         anime_url = f'https://api.myanimelist.net/v2/anime/{id}'
-         anime_params = {
-                 'fields': 'title,synopsis',
-                'limit': '3'
-                }
-         r = requests.get(anime_url, headers=headers, params= anime_params)
-         anime_details.append(r.json())
-
-
-      #specific anime details
-    for anime in anime_details:
-                anime_data = {
-                                'id' : anime['id'],
-                                'title' : anime['title'],
-                                'main_picture' : anime['main_picture']['large'],                 
-                                'synopsis' : anime['synopsis']            
-                               
-                        }
-                                                
-                animes.append(anime_data)
-        
-    return animes[:6]
+    if not ranking_type:
+         return jsonify ({'error':'Invalid ranking type'}), 400
     
+    else:
+         
+        animes = []
+        url = 'https://api.myanimelist.net/v2/anime/ranking'
+        headers = {
+            'X-MAL-CLIENT-ID': CLIENT_ID,
+        }
+        params = {
+            'ranking_type': ranking_type,
+            'limit': '9'
+        }
+    
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()  # Raise an exception
+        results = response.json().get('data', [])
+        anime_ids = [result['node']['id'] for result in results]
+
+        anime_details = []
+        for id in anime_ids:
+            anime_url = f'https://api.myanimelist.net/v2/anime/{id}'
+            anime_params = {
+                    'fields': 'title,synopsis,main_picture',
+                    'limit': '3'
+                    }
+            r = requests.get(anime_url, headers=headers, params= anime_params)
+            anime_details.append(r.json())
+
+        #specific anime details
+        for anime in anime_details:
+            anime_data = {
+                'id' : anime['id'],
+                'title' : anime['title'],
+                'image' : anime['main_picture']['large'] if 'main_picture' in anime and 'large' in anime['main_picture'] else None,                 
+                'synopsis' : anime['synopsis']            
+            }
+            animes.append(anime_data)
+        
+    return jsonify(animes[:8])
+    
+
+
+
+
 
 # Add anime to list
 @anime.route('/add_to_list', methods=['POST'])
