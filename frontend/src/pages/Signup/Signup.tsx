@@ -9,11 +9,21 @@ import {
 
 import Button from "@mui/material/Button";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Alert from "@mui/material/Alert";
+import { useNavigate } from "react-router";
 
 const SignUpPage = () => {
   //Form function to handle the user submit
   // Default variables, set to empty string to change later in function
   // sets form value and returns it throughout application
+
+  //Alert popover
+  const [showAlert, setShowAlert] = useState(false);
+
+  //navigate user after successful signup
+  let navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     username: "",
@@ -45,6 +55,8 @@ const SignUpPage = () => {
 
       if (response.ok) {
         console.log("Signup successful!");
+        setShowAlert(true); //set Alert to true
+        navigate("/Home");
       } else {
         let errorMessage = "Unknown error";
         try {
@@ -130,10 +142,52 @@ const SignUpPage = () => {
               setFormData({ ...formData, password2: e.target.value })
             }
           />
-
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 1 }}>
             Sign Up
           </Button>
+          {/* Show alert after user successfully Signs up */}
+          {showAlert && (
+            <Box
+              sx={{
+                position: "fixed",
+                top: 20,
+                left: 0,
+                right: 0,
+                display: "flex",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              <Alert
+                severity="success"
+                onClose={() => setShowAlert(false)}
+                sx={{ width: "fit-content" }}
+              >
+                Signup Successful!
+              </Alert>
+            </Box>
+          )}
+
+          {/* Sign in button for a current user  */}
+          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+            Already have an account?{" "}
+            <Link
+              to="/SignIn"
+              style={{
+                textDecoration: "none",
+                color: "#1976d2",
+                fontWeight: "bold",
+              }}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.textDecoration = "underline")
+              }
+              onMouseOut={(e) =>
+                (e.currentTarget.style.textDecoration = "none")
+              }
+            >
+              Sign In
+            </Link>
+          </Typography>
         </Box>
       </Paper>
     </Container>

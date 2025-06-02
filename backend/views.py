@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 from anime_search import get_anime_ranking
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from sqlalchemy import select
+from flask import jsonify, url_for
 # from models import User
 
 
@@ -60,6 +61,40 @@ def watchlist(status):
 
     return render_template('watchlist.html', user=current_user, watchlist=watchlist, selected_status=status)
 
+
+# API endpoint to get user profile information 
+@views.route("/api/profile", methods=['GET', 'OPTIONS'])
+def api_profile():
+
+    if request.method == "OPTIONS":
+        response = jsonify({"message": "CORS preflight response"})
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response
+    
+
+    if current_user.is_authenticated:
+        image_file = url_for(
+            'static',
+            filename='profile_pics/' + current_user.image_file
+        ) if current_user.image_file else url_for(
+            'static',
+            filename='profile_pics/default.jpg'
+        )
+
+        return jsonify({
+            "loggedIn": True,
+            "user": {
+                "id": current_user.id,
+                "username": current_user.username,
+                "email": current_user.email,
+                "image": image_file
+            }
+        }), 200
+    else:
+        return jsonify({"loggedIn": False, "message": "User not authenticated"}), 401
 
    
 

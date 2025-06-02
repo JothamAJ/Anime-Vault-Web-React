@@ -8,8 +8,12 @@ import {
   Button,
 } from "@mui/material";
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+import { UserContext } from "../../contexts/AuthContext";
+import { set } from "react-hook-form";
 
 const SignInPage = () => {
   //username and password states
@@ -19,6 +23,12 @@ const SignInPage = () => {
     email: "",
     password: "",
   });
+
+  //Alert popover
+  const [showAlert, setShowAlert] = useState(false);
+
+  //useContext to access user state from UserContext
+  const { setUser } = useContext(UserContext); // setUser function to update user state after login
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +46,23 @@ const SignInPage = () => {
       });
 
       if (response.ok) {
+        //set user state after successful login
+        const userData = await response.json();
+        setUser({
+          id: userData.id,
+          email: userData.email,
+          username: userData.username,
+        });
+
+        console.log("User data set:", userData);
+
+        setShowAlert(true); //set Alert to true
+
         console.log("Login successful!");
-        navigate("/Home");
+
+        setTimeout(() => {
+          navigate("/Home");
+        }, 3000);
       } else {
         let errorMessage = "Unknown error";
 
@@ -111,6 +136,49 @@ const SignInPage = () => {
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 1 }}>
             Sign In
           </Button>
+          {/* Show alert using snackbar component after user successfully signs in */}
+          {showAlert && (
+            <Box
+              sx={{
+                position: "fixed",
+                top: 20,
+                left: 0,
+                right: 0,
+                display: "flex",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              <Snackbar
+                open={showAlert}
+                autoHideDuration={3000} // in ms
+                onClose={() => setShowAlert(false)}
+                message="You successfully logged in!"
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+              />
+            </Box>
+          )}
+
+          {/* Sign up button for a new user  */}
+          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+            Don't have an account?{" "}
+            <Link
+              to="/SignUp"
+              style={{
+                textDecoration: "none",
+                color: "#1976d2",
+                fontWeight: "bold",
+              }}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.textDecoration = "underline")
+              }
+              onMouseOut={(e) =>
+                (e.currentTarget.style.textDecoration = "none")
+              }
+            >
+              Sign Up
+            </Link>
+          </Typography>
         </Box>
       </Paper>
     </Container>

@@ -48,11 +48,21 @@ def login():
                 sys.stdout.write(f"Email: {email}, Password: {password}\n")
                 sys.stdout.flush()
         
-                return jsonify({"success": True, "message": "Login successful"}), 200
+                return jsonify({
+                    "success": True,
+                    "message": "Login successful",
+                    "id": user.id,
+                    "email": user.email,
+                    "username": user.username
+                                            }), 200
 
         else:
         #handle failed login attempt
              return jsonify({"success": False, "message": "Invalid username or password"}), 401
+
+
+
+
 
 @auth.route("/sign-up", methods=['GET', 'POST', 'OPTIONS'])
 def sign_up():
@@ -127,11 +137,39 @@ def sign_up():
 
 
 
-@auth.route("/logout")
-@cross_origin()
+@auth.route("/logout", methods = ['GET'])
 @login_required #only able to acces page/route if logged in
 def logout():
     logout_user()
-    return redirect(url_for('views.home'))
+    return jsonify({"message": "Logged out successfully"}), 200
     
 
+
+
+from flask_login import current_user, login_required
+from flask import jsonify
+
+
+#  This route returns the current user's information if they are logged in
+@auth.route("/current-user", methods=['GET', 'OPTIONS'])
+def get_current_user():
+
+    if request.method == "OPTIONS":
+        response = jsonify({"message": "CORS preflight response"})
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response
+    
+
+    if current_user.is_authenticated:
+        return jsonify({
+            "loggedIn": True,
+            "user": {
+                "username": current_user.username,
+                "email": current_user.email
+            }
+        }), 200
+    else:
+        return jsonify({"loggedIn": False}), 200

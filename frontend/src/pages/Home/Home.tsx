@@ -6,7 +6,7 @@ import { Grid } from "@mui/material";
 
 const HomePage = () => {
   //Loading state
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   //Anime type
   type Anime = {
@@ -54,6 +54,7 @@ const HomePage = () => {
           setFavoriteAnime(finalVals[2]);
           setAllAnime(finalVals[3]);
           setAiringAnime(finalVals[4]);
+          setIsLoading(false); //set loading to false when we have data
 
           // set state
           console.log("Popular:", finalVals[0]);
@@ -98,7 +99,7 @@ const HomePage = () => {
           }}
         >
           {/* //display animes using card componenet, iterate over animes array using map  */}
-
+          {isLoading && <div>Loading....</div>}
           {popularAnime.map((anime, index) => (
             <AnimeCard
               key={anime.id || index}
