@@ -38,6 +38,12 @@ def create_app():
     app.config['SESSION_PERMANENT'] = False    # Sessions expire when the browser is closed
     app.config['SESSION_FILE_DIR'] = 'flask_sessions'  # Directory to store session files
     app.config['CORS_HEADERS'] = 'Content-Type'
+
+    # set cookies for session management
+    app.config['SESSION_COOKIE_NAME'] = 'anime_vault_session'  # Name of the session cookie
+    app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevents JavaScript access to the cookie
+    app.config['SESSION_COOKIE_SECURE'] = False  # Set to True if using HTTPS
+    app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Controls how cookies are sent with cross-site requests
     Session(app)
 
 

@@ -7,6 +7,8 @@ from flask_cors import cross_origin
 from flask_cors import CORS
 import sys 
 from flask_wtf.csrf import CSRFProtect
+from flask_login import current_user, login_required
+from flask import jsonify
 # for debugging 
 # from __init__ import db
 # from models import User
@@ -27,38 +29,40 @@ def login():
         response.headers["Access-Control-Allow-Credentials"] = "true"
         return response
     
-    if request.method == "GET":
-        return jsonify({"Testing Testing": "Signup endpoint is ready"}), 200
+    # if request.method == "GET":
+    #     return jsonify({"Testing Testing": "Signup endpoint is ready"}), 200
 
-    if request.method =='POST':
+    # if request.method =='POST':
 
-        data = request.get_json()
-        email = data.get("email")
-        password = data.get("password")
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
 
         # catch error
-        if not email or not password:
-            return jsonify({"success": False, "message": "Username and password are required"}), 400
+    if not email or not password:
+        return jsonify({"success": False, "message": "Username and password are required"}), 400
 
-        #If user exists and password matches then log in user
-        user= User.query.filter_by(email=email).first() 
-        if user and check_password_hash(user.password, password):
-                login_user(user, remember= True)
+    # If user exists and password matches then log in user
+    user = User.query.filter_by(email=email).first()
+    if user and check_password_hash(user.password, password):
+        login_user(user, remember=True)
 
-                sys.stdout.write(f"Email: {email}, Password: {password}\n")
-                sys.stdout.flush()
+        sys.stdout.write(f"Email: {email}, Password: {password}\n")
+        print("Login success. current_user is_authenticated:", current_user.is_authenticated)
+
+        sys.stdout.flush()
         
-                return jsonify({
-                    "success": True,
-                    "message": "Login successful",
-                    "id": user.id,
-                    "email": user.email,
-                    "username": user.username
+        return jsonify({
+            "success": True,
+            "message": "Login successful",
+            "id": user.id,
+            "email": user.email,
+            "username": user.username
                                             }), 200
 
-        else:
-        #handle failed login attempt
-             return jsonify({"success": False, "message": "Invalid username or password"}), 401
+    else:
+    #handle failed login attempt
+            return jsonify({"success": False, "message": "Invalid username or password"}), 401
 
 
 
@@ -146,11 +150,7 @@ def logout():
 
 
 
-from flask_login import current_user, login_required
-from flask import jsonify
-
-
-#  This route returns the current user's information if they are logged in
+# returns the current user's information if they are logged in
 @auth.route("/current-user", methods=['GET', 'OPTIONS'])
 def get_current_user():
 
@@ -167,6 +167,7 @@ def get_current_user():
         return jsonify({
             "loggedIn": True,
             "user": {
+                "id": current_user.id,
                 "username": current_user.username,
                 "email": current_user.email
             }

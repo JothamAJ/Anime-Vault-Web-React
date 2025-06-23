@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { UserContext } from "../../contexts/AuthContext";
 
 function ProfilePage() {
   const { user, setUser } = useContext(UserContext);
-  const [profileData, setProfileData] = useState<any>(null);
 
+  // Fetch and update user context on component mount
   useEffect(() => {
     fetch("http://127.0.0.1:5000/api/profile", {
       method: "GET",
@@ -16,24 +16,23 @@ function ProfilePage() {
       })
       .then((data) => {
         if (data.loggedIn) {
-          setProfileData(data.user);
-          setUser(data.user); // directly set the user context with user object
+          setUser(data.user);
         } else {
-          setProfileData(null);
           setUser(null);
         }
       })
       .catch((err) => console.error("Error fetching profile:", err));
-  }, []);
+  }, [setUser]);
 
-  if (!profileData) return <div>Loading profile...</div>;
+  // Show message if user is not logged in
+  if (!user) return <div>Please log in to view your profile.</div>;
 
+  // Show profile if user is logged in
   return (
     <div>
-      <h1>{profileData.username}'s Profile</h1>
-      <img src={profileData.image} alt="Profile" />
-      <p>Email: {profileData.email}</p>
-      {/* Add more profile details as needed */}
+      <h1>{user.username}'s Profile</h1>
+
+      <p>Email: {user.email}</p>
     </div>
   );
 }

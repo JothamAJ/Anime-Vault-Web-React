@@ -47,7 +47,7 @@ export default function UserProvider({ children }: UserProviderProps) {
   // useEffect runs once when the app loads to check if a user is already logged in
   useEffect(() => {
     // Fetch the current user from the backend - return user data if logged in and null if not
-    fetch("http://127.0.0.1:5000/auth/current-user", {
+    fetch("http://127.0.0.1:5000/current-user", {
       method: "GET",
       credentials: "include", // ensures cookies/session are sent
     })
@@ -57,14 +57,16 @@ export default function UserProvider({ children }: UserProviderProps) {
         const data = await res.json();
 
         if (data.loggedIn) {
-          const { email, username } = data.user;
+          const { id, email, username } = data.user;
           setUser({
-            id: "", // ID is not provided in the response, can be set later if needed
+            id, // ID is not provided in the response, can be set later if needed
             email,
             username,
           });
+          console.log("User is logged in:", data.user);
         } else {
-          setUser(null); // No user logged in
+          setUser(null); // No user is logged in
+          console.log("No user is logged in.");
         }
       })
       .catch((err) => {

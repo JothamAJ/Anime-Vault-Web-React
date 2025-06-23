@@ -5,18 +5,21 @@ import {
   Typography,
   Box,
   TextField,
+  Alert,
 } from "@mui/material";
 
 import Button from "@mui/material/Button";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import Alert from "@mui/material/Alert";
 import { useNavigate } from "react-router";
 
 const SignUpPage = () => {
   //Form function to handle the user submit
   // Default variables, set to empty string to change later in function
   // sets form value and returns it throughout application
+
+  //error message state to display error messages
+  const [error, setError] = useState(""); //error state to display error messages
 
   //Alert popover
   const [showAlert, setShowAlert] = useState(false);
@@ -38,6 +41,7 @@ const SignUpPage = () => {
     //password validation
     if (formData.password1 !== formData.password2) {
       console.error("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
 
@@ -53,22 +57,23 @@ const SignUpPage = () => {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        console.log("Signup successful!");
-        setShowAlert(true); //set Alert to true
-        navigate("/Home");
-      } else {
-        let errorMessage = "Unknown error";
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData?.message || JSON.stringify(errorData);
-        } catch (err) {
-          errorMessage = "No JSON response (likely 403 or server issue)";
-        }
-        console.error("Signup failed:", errorMessage);
+      //check if error response
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Signup failed:", errorData);
+        setError(errorData.message || "Signup failed");
+        return;
       }
+
+      //if response is ok, set alert to true and navigate to home page
+      console.log("Signup successful!");
+      setShowAlert(true); //set Alert to true
+      setTimeout(() => {
+        navigate("/Home");
+      }, 2000); // wait 2 seconds before navigating
     } catch (error) {
       console.error("Network error:", error);
+      setError("Network error. Please try again.");
     }
 
     console.log(
@@ -95,11 +100,18 @@ const SignUpPage = () => {
           Sign Up
         </Typography>
 
-        {/* //Box component that includes form to allow user to submit details */}
+        {/* Display error message if there is an error */}
+        {error && (
+          <Typography color="error" sx={{ mt: 1, textAlign: "center" }}>
+            {error}
+          </Typography>
+        )}
 
+        {/* //Box component that includes form to allow user to submit details */}
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
-            placeholder="Enter Username "
+            label="Username"
+            placeholder="Enter Username"
             fullWidth
             required
             autoFocus
@@ -108,20 +120,21 @@ const SignUpPage = () => {
             onChange={(e) =>
               setFormData({ ...formData, username: e.target.value })
             } //update username field, gets new value user types using spread operator
-          ></TextField>
+          />
           <TextField
-            placeholder="Enter Email "
+            label="Email"
+            placeholder="Enter Email"
             fullWidth
             required
-            autoFocus
             sx={{ mb: 2 }}
             value={formData.email}
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
-          ></TextField>
+          />
           <TextField
-            placeholder="Enter Password "
+            label="Password"
+            placeholder="Enter Password"
             fullWidth
             required
             type="password"
@@ -132,7 +145,8 @@ const SignUpPage = () => {
             }
           />
           <TextField
-            placeholder="Repeat Password "
+            label="Confirm Password"
+            placeholder="Repeat Password"
             fullWidth
             required
             type="password"
@@ -145,7 +159,8 @@ const SignUpPage = () => {
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 1 }}>
             Sign Up
           </Button>
-          {/* Show alert after user successfully Signs up */}
+
+          {/* Show alert after user successfully signs up */}
           {showAlert && (
             <Box
               sx={{

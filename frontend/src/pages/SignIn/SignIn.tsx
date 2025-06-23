@@ -18,7 +18,7 @@ import { set } from "react-hook-form";
 const SignInPage = () => {
   //username and password states
   const navigate = useNavigate();
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); //error state to display error messages
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -44,6 +44,12 @@ const SignInPage = () => {
         credentials: "include",
         body: JSON.stringify(formData),
       });
+      //check if error response
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Login failed:", errorData);
+        setError(errorData.message || "Login failed");
+      }
 
       if (response.ok) {
         //set user state after successful login
@@ -64,15 +70,6 @@ const SignInPage = () => {
           navigate("/Home");
         }, 3000);
       } else {
-        let errorMessage = "Unknown error";
-
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData?.message || JSON.stringify(errorData);
-        } catch (err) {
-          errorMessage = "No JSON response (likely 403 or server issue)";
-        }
-        console.error("Login failed:", errorMessage);
         const errorData = await response.json();
         setError(errorData.message || "Login failed");
       }
@@ -136,6 +133,12 @@ const SignInPage = () => {
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 1 }}>
             Sign In
           </Button>
+          {/* Display error message if there is an error */}
+          {error && (
+            <Typography color="error" sx={{ mt: 1, textAlign: "center" }}>
+              {error}
+            </Typography>
+          )}
           {/* Show alert using snackbar component after user successfully signs in */}
           {showAlert && (
             <Box
