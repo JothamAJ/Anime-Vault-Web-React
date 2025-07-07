@@ -25,13 +25,17 @@ function NavBar() {
     // connect to flask backend using fetch and send state values
     try {
       const response = await fetch("http://127.0.0.1:5000/logout", {
-        method: "GET",
+        method: "POST",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json", // ensure the request is sent as JSON
+          Accept: "application/json",
+        },
       });
 
       if (response.ok) {
         //  clear user state after successful logout
-        setUser({ id: "", email: "", username: "" });
+        setUser(null);
         // set Alert to true
         setShowAlert(true);
 

@@ -42,7 +42,7 @@ def create_app():
     # set cookies for session management
     app.config['SESSION_COOKIE_NAME'] = 'anime_vault_session'  # Name of the session cookie
     app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevents JavaScript access to the cookie
-    app.config['SESSION_COOKIE_SECURE'] = False  # Set to True if using HTTPS
+    app.config['SESSION_COOKIE_SECURE'] = True  # Set to True if using HTTPS
     app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Controls how cookies are sent with cross-site requests
     Session(app)
 

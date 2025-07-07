@@ -17,54 +17,98 @@ CLIENT_ID = 'd7382139725675f1a561f7c2fd0009c2'
 auth = Blueprint("auth", __name__)
 
 
-@auth.route("/login", methods = ['GET', 'POST'])
+# @auth.route("/login", methods = ['GET', 'POST'])
+# def login():
+#     from models import User
+
+#     if request.method == "OPTIONS":
+#         response = make_response(jsonify({}), 200)
+#         response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+#         response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+#         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+#         response.headers["Access-Control-Allow-Credentials"] = "true"
+#         return response
+    
+#     # if request.method == "GET":
+#     #     return jsonify({"Testing Testing": "Signup endpoint is ready"}), 200
+
+#     # if request.method =='POST':
+
+#     # Check if the request is JSON due to unsupported media type error
+#     if not request.is_json:
+#         response = jsonify({"success": False, "message": "Expected JSON body"})
+#         response.status_code = 415 
+#         response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+#         response.headers["Access-Control-Allow-Credentials"] = "true"
+#         return response
+
+
+#     data = request.get_json()
+#     email = data.get("email")
+#     password = data.get("password")
+
+#         # catch error
+#     if not email or not password:
+#         return jsonify({"success": False, "message": "Username and password are required"}), 400
+
+#     # If user exists and password matches then log in user
+#     user = User.query.filter_by(email=email).first()
+#     if user and check_password_hash(user.password, password):
+#         login_user(user, remember=True)
+
+#         sys.stdout.write(f"Email: {email}, Password: {password}\n")
+#         print("Login success. current_user is_authenticated:", current_user.is_authenticated)
+
+#         sys.stdout.flush()
+        
+#         return jsonify({
+#             "success": True,
+#             "message": "Login successful",
+#             "id": user.id,
+#             "email": user.email,
+#             "username": user.username
+#                                             }), 200
+
+#     else:
+#     #handle failed login attempt
+#             return jsonify({"success": False, "message": "Invalid username or password"}), 401
+
+
+@auth.route("/login", methods=["POST", "OPTIONS"])
 def login():
     from models import User
 
     if request.method == "OPTIONS":
-        response = make_response()
+        response = make_response(jsonify({}), 200)
         response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
-        response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+        response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
         response.headers["Access-Control-Allow-Credentials"] = "true"
         return response
-    
-    # if request.method == "GET":
-    #     return jsonify({"Testing Testing": "Signup endpoint is ready"}), 200
 
-    # if request.method =='POST':
+    if not request.is_json:
+        return jsonify({"success": False, "message": "Expected JSON body"}), 415
 
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
 
-        # catch error
     if not email or not password:
-        return jsonify({"success": False, "message": "Username and password are required"}), 400
+        return jsonify({"success": False, "message": "Email and password required"}), 400
 
-    # If user exists and password matches then log in user
     user = User.query.filter_by(email=email).first()
     if user and check_password_hash(user.password, password):
         login_user(user, remember=True)
-
-        sys.stdout.write(f"Email: {email}, Password: {password}\n")
-        print("Login success. current_user is_authenticated:", current_user.is_authenticated)
-
-        sys.stdout.flush()
-        
         return jsonify({
             "success": True,
             "message": "Login successful",
             "id": user.id,
             "email": user.email,
             "username": user.username
-                                            }), 200
+        }), 200
 
-    else:
-    #handle failed login attempt
-            return jsonify({"success": False, "message": "Invalid username or password"}), 401
-
-
+    # Failed login (wrong email or password)
+    return jsonify({"success": False, "message": "Invalid email or password"}), 401
 
 
 
@@ -140,8 +184,8 @@ def sign_up():
 
 
 
-
-@auth.route("/logout", methods = ['GET'])
+# Route to log out the user
+@auth.route("/logout", methods = ['POST'])
 @login_required #only able to acces page/route if logged in
 def logout():
     logout_user()

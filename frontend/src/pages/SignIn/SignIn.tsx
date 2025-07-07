@@ -32,7 +32,7 @@ const SignInPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    //connect to flask backend using fetch and send state values
+    // connect to flask backend using fetch and send state values
     try {
       const response = await fetch("http://127.0.0.1:5000/login", {
         method: "POST",
@@ -44,49 +44,43 @@ const SignInPage = () => {
         credentials: "include",
         body: JSON.stringify(formData),
       });
-      //check if error response
+
+      // parse response JSON once
+      const data = await response.json();
+
+      // check if error response
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Login failed:", errorData);
-        setError(errorData.message || "Login failed");
+        console.error("Login failed:", data);
+        setError(data.message || "Login failed");
+        return; // stop further execution on error
       }
 
       if (response.ok) {
-        //set user state after successful login
-        const userData = await response.json();
+        // set user state after successful login
         setUser({
-          id: userData.id,
-          email: userData.email,
-          username: userData.username,
+          id: data.id,
+          email: data.email,
+          username: data.username,
         });
+        // Log the user data to the console for debugging
+        console.log("Sending login:", formData.email, formData.password);
+        console.log("User data set:", data);
 
-        console.log("User data set:", userData);
+        setShowAlert(true); // set Alert to true
 
-        setShowAlert(true); //set Alert to true
-
-        console.log("Login successful!");
+        console.log("Login successful congrats!");
 
         setTimeout(() => {
           navigate("/Home");
         }, 3000);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed");
       }
     } catch (error) {
       console.error("Network error:", error);
+      setError("Network error occurred. Please try again.");
     }
 
     console.log(formData.email + "     " + formData.password);
   };
-
-  {
-    error && (
-      <Typography color="error" sx={{ mt: 1 }}>
-        {error}
-      </Typography>
-    );
-  }
 
   return (
     <Container maxWidth="xs">
