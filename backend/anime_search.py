@@ -123,134 +123,51 @@ def get_anime_ranking(ranking_type):
     
 
 
+# Route to add anime to user's watchlist
 
 
+anime_api = Blueprint('anime_api', __name__)
 
-# Add anime to list
-@anime.route('/add_to_list', methods=['POST'])
+@anime_api.route('/add_to_list', methods=['POST'])
 @login_required
-def add_to_list():
-    from models import User, Anime, db
+def add_to_list_api():
+    from models import Anime, db
+    data = request.json
 
-    # Get the anime details from the session
-    anime_id = request.form.get('anime_id')
-    anime_title = request.form.get('anime_title')
-    anime_picture = request.form.get('anime_main_picture')
-    anime_synopsis = request.form.get('anime_synopsis')
-    anime_episodes = request.form.get('anime_episodes')
-    anime_genres = request.form.get('anime_genres')
+    anime_id = data.get('anime_id')
+    anime_title = data.get('anime_title')
+    anime_picture = data.get('anime_main_picture')
+    anime_synopsis = data.get('anime_synopsis')
+    anime_episodes = data.get('anime_episodes')
+    anime_genres = data.get('anime_genres')
 
-    print("Your request", request.form)
-
-    # Validate inputs
     if not anime_id or not anime_title:
-        flash("Invalid anime data", category='error')
-        return redirect(url_for('views.watchlist'))
+        return jsonify({"error": "Invalid anime data"}), 400
 
-    # Check if the anime is already in the list
     existing_anime = Anime.query.filter_by(id=anime_id, user_id=current_user.id).first()
+
     if existing_anime and existing_anime.status == "Watching":
-        flash("Anime is already in your list", category='error')
-        return redirect(url_for('views.watchlist', status='Watching'))
-    
-    # If the anime is in the list but dropped, update the status
+        return jsonify({"error": "Anime is already in your list"}), 400
+
     elif existing_anime:
-        # Update the status if the anime exists
         existing_anime.status = "Watching"
         db.session.commit()
-        flash(f"{anime_title} has been added back to your watching list!", category='success')
-        return redirect(url_for('views.watchlist', status='Watching'))
+        return jsonify({"message": f"{anime_title} status updated to Watching"}), 200
 
-    # Create new anime entry for user and add to list
     new_anime = Anime(
         id=anime_id,
         title=anime_title,
         status='Watching',
-        main_picture = anime_picture,
-        synopsis = anime_synopsis,
-        episodes = anime_episodes,
-        genres = anime_genres,
+        main_picture=anime_picture,
+        synopsis=anime_synopsis,
+        episodes=anime_episodes,
+        genres=anime_genres,
         user_id=current_user.id
     )
 
-    # Save the new anime to the database
     db.session.add(new_anime)
     db.session.commit()
-    flash(f"{anime_title} added to your list", category='success')
-    return redirect(url_for('views.watchlist', status='Watching'))
 
+    return jsonify({"message": f"{anime_title} added to your list"}), 201
 
-
-# Change status of anime
-@anime.route('/change_status', methods=['POST'])
-@login_required
-def change_status():
-    from models import User, Anime, db
-
-    # Basic anime details and status
-    anime_id = request.form.get('anime_id')
-    anime_title = request.form.get('anime_title')
-    anime_picture = request.form.get('anime_main_picture')
-    anime_synopsis = request.form.get('anime_synopsis')
-    anime_episodes = request.form.get('anime_episodes')
-    anime_genres = request.form.get('anime_genres')
-    new_status = request.form.get('new_status')
-
-    # Debugging: Print form data to see if they are correctly populated
-    print(f"anime_id: {anime_id}")
-    print(f"anime_title: {anime_title}")
-
-
-    # Check if the status is valid
-    if new_status not in ['Watching', 'Dropped', 'Completed', 'On-Hold', 'Plan-to-Watch']:
-        flash('Invalid status', category = 'error')
-        return redirect(url_for('views.watchlist', status = new_status))
-
-    # Check if the anime is in the list
-    if not anime_id or not anime_title or not new_status:
-          flash('Invalid anime data', category = 'error')
-          return redirect(url_for('views.watchlist', status = new_status))
-    
-    # Query the anime to update in SQL database
-    anime_to_update = Anime.query.filter_by(id = anime_id,
-                                        user_id=current_user.id).first()
-                                        
-      # Create new anime entry for user and add to list
-    new_anime = Anime(
-        id=anime_id,
-        title=anime_title,
-        status=new_status,
-        main_picture = anime_picture,
-        synopsis = anime_synopsis,
-        episodes = anime_episodes,
-        genres = anime_genres,
-        user_id=current_user.id
-    )
-    
-    # Update status
-
-    if anime_to_update:
-        if anime_to_update.status != new_status:
-            anime_to_update.status = new_status
-            db.session.add(anime_to_update)
-            db.session.commit()
-            print(f"anime_to_update: {anime_to_update}")
-
-            flash(f"{anime_title} has been updated", category = 'success')
-            print(f"new_status is: {new_status}")
-            print({anime_to_update.status})
-            return redirect(url_for('views.watchlist', status = new_status))
-        
-    elif not anime_to_update:
-        print(f" new anime_to_update: {anime_to_update}")
-        db.session.add(new_anime)
-        db.session.commit()
-          
-    else:
-          flash('No update', category = 'error')
-
-
-
-    return redirect(url_for('views.watchlist', status = new_status))
-    
-
+   
