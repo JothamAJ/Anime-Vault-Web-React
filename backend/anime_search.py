@@ -1,5 +1,5 @@
 #Routes for interacting with my anime list api 
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from flask import session
 from flask import jsonify
@@ -74,8 +74,6 @@ def anime_search():
 
 
 
-
-
 @anime.route('/ranking/<ranking_type>', methods=['GET'])
 def get_anime_ranking(ranking_type):
 
@@ -124,11 +122,7 @@ def get_anime_ranking(ranking_type):
 
 
 # Route to add anime to user's watchlist
-
-
-anime_api = Blueprint('anime_api', __name__)
-
-@anime_api.route('/add_to_list', methods=['POST'])
+@anime.route('/add_to_list', methods=['POST'])
 @login_required
 def add_to_list_api():
     from models import Anime, db

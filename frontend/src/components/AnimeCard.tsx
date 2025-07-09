@@ -6,18 +6,15 @@ import {
   Typography,
   Button,
 } from "@mui/material";
+import AddToListButton from "./AddToListButton"; // adjust path as needed
+import { Anime } from "../types/Anime";
 
-//Component to display a single anime card
 type AnimeCardProps = {
-  title: string;
-  image: string;
-  synopsis: string;
-  onClick: () => void;
+  anime: Anime;
 };
 
-function AnimeCard({ title, image, synopsis, onClick }: AnimeCardProps) {
+function AnimeCard({ anime }: AnimeCardProps) {
   return (
-    // Card component with hover effect and styling - hover and transitioning too
     <Card
       sx={{
         width: 240,
@@ -36,26 +33,24 @@ function AnimeCard({ title, image, synopsis, onClick }: AnimeCardProps) {
         flexShrink: 0,
       }}
     >
-      {/* Anime image */}
       <CardMedia
         component="img"
         height="250"
-        image={image}
-        alt={title}
+        image={anime.main_picture}
+        alt={anime.title}
         sx={{
           objectFit: "cover",
           borderRadius: "8px 8px 0 0",
           width: "100%",
         }}
       />
-      {/* Card content with title and synopsis (for now) */}
       <CardContent>
         <Typography
           variant="h6"
           component="div"
           sx={{ fontWeight: 600, fontSize: "1.1rem", mb: 1 }}
         >
-          {title}
+          {anime.title}
         </Typography>
         <Typography
           variant="body2"
@@ -66,16 +61,20 @@ function AnimeCard({ title, image, synopsis, onClick }: AnimeCardProps) {
             overflow: "hidden",
           }}
         >
-          {/* {synopsis.length > 150 ? synopsis.slice(0, 150) + "..." : synopsis} */}
-          Synopsis....
+          {anime.synopsis.length > 150
+            ? anime.synopsis.slice(0, 150) + "..."
+            : anime.synopsis}
         </Typography>
       </CardContent>
-
-      {/* View details button - change to add to list - view details through popover */}
       <CardActions>
-        <Button size="small" onClick={onClick}>
-          View Details
-        </Button>
+        <AddToListButton
+          anime={{
+            ...anime,
+            episodes: anime.episodes ?? 0,
+            genres: anime.genres ?? "",
+          }}
+          category="Watching" // or dynamically pass if needed
+        />
       </CardActions>
     </Card>
   );
