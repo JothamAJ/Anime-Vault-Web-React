@@ -2,7 +2,7 @@
 export type Anime = {
   id: number;
   title: string;
-  main_picture: string;
+  image: { large: string } | null;
   synopsis: string;
   episodes?: number;
   genres?: string;

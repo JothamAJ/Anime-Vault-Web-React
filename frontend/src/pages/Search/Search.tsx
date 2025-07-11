@@ -3,15 +3,17 @@ import { SearchBar } from "../../components/SearchBar";
 import AnimeCard from "../../components/AnimeCard";
 import { useEffect, useState } from "react";
 import { Grid } from "@mui/material";
+import { Anime } from "../../types/Anime"; // Import the Anime type
 
 const SearchPage = () => {
   //Anime type
-  type Anime = {
-    id?: number;
-    title: string;
-    image: string;
-    synopsis: string;
-  };
+  // type Anime = {
+  //   id?: number;
+  //   title: string;
+  //   image: string;
+  //   synopsis: string;
+  //   main_picture?: string;
+  // };
 
   const [input, setInput] = useState(""); //user input
   const [animes, setAnimes] = useState<Anime[]>([]); //state veriable to hold fetched results
@@ -62,13 +64,7 @@ const SearchPage = () => {
           {animes &&
             animes.length > 0 &&
             animes.map((anime, index) => (
-              <AnimeCard
-                key={anime.id || index}
-                title={anime.title}
-                image={anime.image}
-                synopsis={anime.synopsis}
-                onClick={() => console.log(`Clicked ${anime.title}`)}
-              />
+              <AnimeCard key={anime.id} anime={anime} />
             ))}
         </Grid>
       </Grid>

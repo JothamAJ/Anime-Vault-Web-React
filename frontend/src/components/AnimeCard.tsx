@@ -36,7 +36,7 @@ function AnimeCard({ anime }: AnimeCardProps) {
       <CardMedia
         component="img"
         height="250"
-        image={anime.main_picture}
+        image={anime.image?.large}
         alt={anime.title}
         sx={{
           objectFit: "cover",

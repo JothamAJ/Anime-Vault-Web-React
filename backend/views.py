@@ -11,13 +11,6 @@ from flask_login import login_required, current_user
 
 views = Blueprint("views", __name__)
 
-
-
-
-
-
-
-
 # @views.route('/watchlist/<status>')
 # @login_required
 # def watchlist(status):

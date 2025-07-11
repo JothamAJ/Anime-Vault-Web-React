@@ -2,19 +2,13 @@ import { Container, Typography, Box } from "@mui/material";
 import { SearchBar } from "../../components/SearchBar";
 import AnimeCard from "../../components/AnimeCard";
 import { useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Anime } from "../../types/Anime"; // Import the Anime type
 
 const HomePage = () => {
   //Loading state
   const [isLoading, setIsLoading] = useState(true);
 
   //Anime type
-  type Anime = {
-    id?: number;
-    title: string;
-    image: string;
-    synopsis: string;
-  };
 
   //Ranking type
 
@@ -99,15 +93,10 @@ const HomePage = () => {
           }}
         >
           {/* //display animes using card componenet, iterate over animes array using map  */}
+
           {isLoading && <div>Loading....</div>}
           {popularAnime.map((anime, index) => (
-            <AnimeCard
-              key={anime.id || index}
-              title={anime.title}
-              image={anime.image}
-              synopsis={anime.synopsis}
-              onClick={() => console.log(`Clicked ${anime.title}`)}
-            />
+            <AnimeCard key={anime.id} anime={anime} />
           ))}
         </Box>
 
@@ -128,13 +117,7 @@ const HomePage = () => {
           {/* //display animes using card componenet, iterate over animes array using map  */}
 
           {upcomingAnime.map((anime, index) => (
-            <AnimeCard
-              key={anime.id || index}
-              title={anime.title}
-              image={anime.image}
-              synopsis={anime.synopsis}
-              onClick={() => console.log(`Clicked ${anime.title}`)}
-            />
+            <AnimeCard key={anime.id} anime={anime} />
           ))}
         </Box>
 
@@ -155,13 +138,7 @@ const HomePage = () => {
           {/* //display animes using card componenet, iterate over animes array using map  */}
 
           {favoriteAnime.map((anime, index) => (
-            <AnimeCard
-              key={anime.id || index}
-              title={anime.title}
-              image={anime.image}
-              synopsis={anime.synopsis}
-              onClick={() => console.log(`Clicked ${anime.title}`)}
-            />
+            <AnimeCard key={anime.id} anime={anime} />
           ))}
         </Box>
 
@@ -182,13 +159,7 @@ const HomePage = () => {
           {/* //display animes using card componenet, iterate over animes array using map  */}
 
           {airingAnime.map((anime, index) => (
-            <AnimeCard
-              key={anime.id || index}
-              title={anime.title}
-              image={anime.image}
-              synopsis={anime.synopsis}
-              onClick={() => console.log(`Clicked ${anime.title}`)}
-            />
+            <AnimeCard key={anime.id} anime={anime} />
           ))}
         </Box>
 
@@ -209,13 +180,7 @@ const HomePage = () => {
           {/* //display animes using card componenet, iterate over animes array using map  */}
 
           {allAnime.map((anime, index) => (
-            <AnimeCard
-              key={anime.id || index}
-              title={anime.title}
-              image={anime.image}
-              synopsis={anime.synopsis}
-              onClick={() => console.log(`Clicked ${anime.title}`)}
-            />
+            <AnimeCard key={anime.id} anime={anime} />
           ))}
         </Box>
       </Box>

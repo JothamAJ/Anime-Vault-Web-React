@@ -1,15 +1,9 @@
 import React, { useState } from "react";
+import { Anime } from "../types/Anime";
 
 type AddToListButtonProps = {
-  anime: {
-    id: number;
-    title: string;
-    main_picture: string;
-    synopsis: string;
-    episodes: number;
-    genres: string;
-  };
-  category?: string; // Optional, default "Watching"
+  anime: Anime & { episodes: number; genres: string }; // extend optional fields to be required here
+  category?: string;
 };
 
 export default function AddToListButton({
@@ -33,7 +27,7 @@ export default function AddToListButton({
         body: JSON.stringify({
           anime_id: anime.id,
           anime_title: anime.title,
-          anime_main_picture: anime.main_picture,
+          // anime_main_picture: anime.main_picture,
           anime_synopsis: anime.synopsis,
           anime_episodes: anime.episodes,
           anime_genres: anime.genres,
@@ -45,8 +39,10 @@ export default function AddToListButton({
 
       if (response.ok) {
         setMessage(data.message || "Added to list!");
+        console.log("Added to list:", data);
       } else {
         setError(data.error || "Failed to add anime");
+        console.error("Error adding to list:", data);
       }
     } catch (err) {
       setError("Network error");
